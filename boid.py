@@ -59,9 +59,9 @@ class Vehicle(pg.sprite.Sprite):
         heading_diff = 180 - (180 - new_heading + old_heading) % 360
         if abs(heading_diff) > 6:
             if heading_diff > 6:
-                new_heading = old_heading + 6
+                new_heading = old_heading + 10
             else:
-                new_heading = old_heading - 6
+                new_heading = old_heading - 10
 
         self.velocity.from_polar((speed, new_heading))
 
@@ -81,7 +81,7 @@ class Vehicle(pg.sprite.Sprite):
 
         # draw
         self.image = pg.transform.rotate(Vehicle.image, -self.heading)
-
+        self.rect = self.image.get_rect(center=self.position)
 
     def avoid_edge(self):
         left = self.edges[0] - self.position.x
@@ -131,11 +131,11 @@ class Vehicle(pg.sprite.Sprite):
 class Boid(Vehicle):
 
     # CONFIG
-    min_speed = .02
-    max_speed = 0.15
+    min_speed = 0.05
+    max_speed = 0.30
     max_force = 1
     perception = 70 #* Distance where boids can "See" each other(Higher is bigger radius)
-    crowding = 0 #* Distance between boids(lower is more crowded due to no seperation)
+    crowding = 20 #* Distance between boids(lower is more crowded as there is less(no) seperation)
     can_wrap = False #* If boids can wrap to other side
     edge_distance_pct = 10 #* Distance before boids gets pushed back by the edges
     follow_cursor = True #* If boids follow the on-screen cursor
@@ -162,8 +162,8 @@ class Boid(Vehicle):
         steering = pg.Vector2()
         for boid in boids: #? For each individual boid 
             dist = self.position.distance_to(boid.position)
-            if dist < self.crowding and self.crowding > 0:
-                steering -= boid.position - self.position
+            if (dist < self.crowding and self.crowding > 0):
+                steering -= (boid.position - self.position)
         steering = self.clamp_force(steering)
         return steering
 
