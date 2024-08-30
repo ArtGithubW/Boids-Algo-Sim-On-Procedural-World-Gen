@@ -6,8 +6,8 @@ import pygame_gui
 
 from boid import Boid
 
-num_boids = 154
-default_geometry = "600x600"
+num_boids = 200
+default_geometry = "1200x800"
 
 def update(dt, boids, manager):
     """
@@ -29,14 +29,14 @@ def update(dt, boids, manager):
                 boids.empty()
                 add_boids(boids, num_boids)
                 print("Reset Boids")
-            elif event.ui_element == toggle_debug_button:
-                for boid in boids:
-                    boid.debug = not boid.debug
-                print(f"Debug: {boid.debug}")
             elif event.ui_element == toggle_cursor_follow_button:
                 for boid in boids:
                     boid.follow_cursor = not boid.follow_cursor
                 print(f"Follow Cursor: {not boid.follow_cursor}")
+            elif event.ui_element == Wrap_button:
+                for boid in boids:
+                    boid.can_wrap = not boid.can_wrap
+                print(f"Wrap?: {boid.can_wrap}")
         manager.process_events(event)
 
     for b in boids:
@@ -59,12 +59,13 @@ def draw(screen, background, boids, manager):
     
     # Update the display with all changes
     pg.display.update()
+    
 def main(args):
     # Initialize pygame.
     pg.init()
 
     # Set up the clock to maintain a relatively constant framerate.
-    fps = 60.0
+    fps = 100.0
     fpsClock = pg.time.Clock()
 
     # Set up the window.
@@ -85,7 +86,7 @@ def main(args):
     # Create UI manager
     
 
-    global add_boids_button, remove_boids_button, reset_boids_button, toggle_debug_button,toggle_cursor_follow_button
+    global add_boids_button, remove_boids_button, reset_boids_button,toggle_cursor_follow_button,Wrap_button
     add_boids_button = pygame_gui.elements.UIButton(
         relative_rect=pg.Rect((10, 10), (100, 50)),
         text='Add Boids',
@@ -106,11 +107,12 @@ def main(args):
         text='Tog F-Cursor',
         manager=manager
     )
-    toggle_debug_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((10, 190), (100, 50)),
-        text='Tog Debug',
+    Wrap_button = pygame_gui.elements.UIButton(
+        relative_rect=pg.Rect((120, 70), (100, 50)),
+        text='Tog Wrap',
         manager=manager
     )
+    
 
     # Main game loop.
     dt = 1/fps  # dt is the time since last frame.
