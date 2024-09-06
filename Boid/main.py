@@ -4,7 +4,7 @@ import pygame as pg
 from pygame.locals import *
 import pygame_gui
 
-from boid import Boid
+from Boid.boid import Boid
 
 num_boids = 200
 default_geometry = "1200x800"

@@ -9,14 +9,14 @@ def GenNoiseMap() -> list:
     noise2 = PerlinNoise(octaves=6, seed=SEED)
     noise3 = PerlinNoise(octaves=12, seed=SEED)
     noise4 = PerlinNoise(octaves=24, seed=SEED)
-    xpix, ypix = WINDOW_WIDTH + 1, WINDOW_HEIGHT + 1
-    for j in range(ypix):
+    x_loc, y_loc = WINDOW_WIDTH + 1, WINDOW_HEIGHT + 1
+    for j in range(y_loc):
         row = []
-        for i in range(xpix):
-            noise_val = noise1([i/xpix, j/ypix])
-            noise_val += 0.5 * noise2([i/xpix, j/ypix])
-            noise_val += 0.25 * noise3([i/xpix, j/ypix])
-            noise_val += 0.125 * noise4([i/xpix, j/ypix])
+        for i in range(x_loc):   
+            noise_val = noise1([i/x_loc, j/y_loc])          # Main curve
+            noise_val += 0.5 * noise2([i/x_loc, j/y_loc])   # the remaining adds to main curve
+            noise_val += 0.25 * noise3([i/x_loc, j/y_loc])  
+            noise_val += 0.125 * noise4([i/x_loc, j/y_loc])
             row.append(noise_val)
         noise_map.append(row)
     return noise_map
@@ -44,7 +44,7 @@ def GenIntMap(NoiseMap) -> list:
         previous_height = height
     # max_terrain_heights[SNOW] = max_value # Makes sure the SNOW is the last value in this list
 
-    terrain_map = []
+    terrain_int_map = []
 
     for row in NoiseMap:
         map_row = []
@@ -53,5 +53,5 @@ def GenIntMap(NoiseMap) -> list:
                 if value <= max_terrain_heights[terrain_type]:
                     map_row.append(terrain_type)
                     break
-        terrain_map.append(map_row) 
-        
+        terrain_int_map.append(map_row) 
+    return terrain_int_map
