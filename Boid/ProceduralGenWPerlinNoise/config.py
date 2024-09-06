@@ -9,12 +9,12 @@ OCEAN = 1
 OCEAN_DEEP = 0
 
         
-SEED = 12 #For consistency for now
-TERRAINWEIGHT =     [ 30 , 30  , 5   , 20  , 10  , 10]       
-TERRAINTYPE = [OCEAN_DEEP,OCEAN,BEACH,GRASS,MOUNT,SNOW]\
+SEED = 9 #For consistency for now
+TERRAINWEIGHT =     [20, 40, 7, 35, 40, 30]      
+TERRAINTYPE = [OCEAN_DEEP,OCEAN,BEACH,GRASS,MOUNT,SNOW]
     
 COLOR_MAP = {
-    0: "blue4",                 # Ocean Deep
+    0: "aqua",                 # Ocean Deep
     1: "aqua",                  # Ocean
     2: "darkgoldenrod1",        # Beach
     3: "darkolivegreen2",       # Grass

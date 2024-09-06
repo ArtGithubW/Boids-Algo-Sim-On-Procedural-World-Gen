@@ -1,14 +1,15 @@
 from perlin_noise import PerlinNoise
-from config import *
+from ProceduralGenWPerlinNoise.config import *
 
 
 # This function generates 4 perlin noises then add them all up into a 2d matrix
 def GenNoiseMap() -> list:
     noise_map = []
-    noise1 = PerlinNoise(octaves=3, seed=SEED)
-    noise2 = PerlinNoise(octaves=6, seed=SEED)
-    noise3 = PerlinNoise(octaves=12, seed=SEED)
-    noise4 = PerlinNoise(octaves=24, seed=SEED)
+    noise1 = PerlinNoise(octaves=3,seed = SEED) #
+    noise2 = PerlinNoise(octaves=6,seed = SEED) 
+    noise3 = PerlinNoise(octaves=12,seed = SEED)
+    noise4 = PerlinNoise(octaves=18,seed = SEED)
+
     x_loc, y_loc = WINDOW_WIDTH + 1, WINDOW_HEIGHT + 1
     for j in range(y_loc):
         row = []

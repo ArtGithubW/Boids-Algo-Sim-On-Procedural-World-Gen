@@ -3,11 +3,13 @@ import sys
 import pygame as pg
 from pygame.locals import *
 import pygame_gui
+from boid import Boid
+sys.path.insert(1, './ProceduralGenWPerlinNoise')
+from ProceduralGenWPerlinNoise.helper import GenNoiseMap,GenIntMap
+from ProceduralGenWPerlinNoise.config import * 
 
-from Boid.boid import Boid
-
-num_boids = 200
-default_geometry = "1200x800"
+num_boids = 100
+default_geometry = "720x480"
 
 def update(dt, boids, manager):
     """
@@ -51,16 +53,28 @@ def draw(screen, background, boids, manager):
     # Draw the background
     screen.blit(background, (0, 0))
     
-    # Draw the boids
-    dirty = boids.draw(screen)
-    
-    # Draw the UI elements on top
+    boids.draw(screen)
     manager.draw_ui(screen)
-    
-    # Update the display with all changes
+
     pg.display.update()
     
 def main(args):
+    # Generates the map and turn it into a background
+    noise_map = GenNoiseMap()
+    map_int = GenIntMap(noise_map)
+    
+    background_surface = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+
+    for y, row in enumerate(map_int):
+        for x, value in enumerate(row):
+
+            if x >= WINDOW_WIDTH or y >= WINDOW_HEIGHT:  # Check boundary conditions
+                continue
+            
+            # Use the color map to set individual pixel on the background surface
+            color = COLOR_MAP[value]
+            background_surface.set_at((x, y), color)
     # Initialize pygame.
     pg.init()
 
@@ -76,8 +90,6 @@ def main(args):
     screen = pg.display.set_mode((window_width, window_height), flags)
     screen.set_alpha(None)
     manager = pygame_gui.UIManager((window_width, window_height))
-    background = pg.Surface(screen.get_size()).convert()
-    background.fill(pg.Color('black'))
 
     boids = pg.sprite.RenderUpdates()
 
@@ -88,27 +100,27 @@ def main(args):
 
     global add_boids_button, remove_boids_button, reset_boids_button,toggle_cursor_follow_button,Wrap_button
     add_boids_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((10, 10), (100, 50)),
+        relative_rect=pg.Rect((10, 10), (100, 30)),
         text='Add Boids',
         manager=manager
     )
     remove_boids_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((10, 70), (100, 50)),
+        relative_rect=pg.Rect((10, 40), (100, 30)),
         text='Remove Boids',
         manager=manager
     )
     reset_boids_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((10, 130), (100, 50)),
+        relative_rect=pg.Rect((10, 70), (100, 30)),
         text='Reset Boids',
         manager=manager
     )
     toggle_cursor_follow_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((120, 10), (100, 50)),
+        relative_rect=pg.Rect((120, 10), (100, 30)),
         text='Tog F-Cursor',
         manager=manager
     )
     Wrap_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((120, 70), (100, 50)),
+        relative_rect=pg.Rect((120, 40), (100, 30)),
         text='Tog Wrap',
         manager=manager
     )
@@ -119,7 +131,7 @@ def main(args):
 
     while True:
         update(dt, boids, manager)
-        draw(screen, background, boids, manager)
+        draw(screen, background_surface, boids, manager)
         dt = fpsClock.tick(fps)
 
 

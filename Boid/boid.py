@@ -19,7 +19,7 @@ class Vehicle(pg.sprite.Sprite):
     random_color = random.choice(colors)
 
     image = pg.Surface((10, 10), pg.SRCALPHA)
-    pg.draw.polygon(image, random_color, [(15, 5), (0, 2), (0, 8)])
+    pg.draw.polygon(image, random_color, [(5, 5), (0, 2), (0, 5)])
 
     def __init__(self, position, velocity, min_speed, max_speed,
                  max_force, can_wrap):
@@ -99,6 +99,9 @@ class Vehicle(pg.sprite.Sprite):
             steering = pg.Vector2()
 
         return steering
+    
+    def avoid_extremes(self):       #TODO: Check if the current vehicle object is on top of any extreme terrain(OCEAN_DEEP, or SNOW)
+        return None
 
     def wrap(self):
         if self.position.x < 0:
@@ -134,10 +137,10 @@ class Boid(Vehicle):
     min_speed = 0.05
     max_speed = 0.20
     max_force = 1
-    perception = 70 #* Distance where boids can "See" each other(Higher is bigger radius)
-    crowding = 20 #* Distance between boids(lower is more crowded as there is less(no) seperation)
+    perception = 30 #* Distance where boids can "See" each other(Higher is bigger radius)
+    crowding = 10 #* Distance between boids(lower is more crowded as there is less(no) seperation)
     can_wrap = False #* If boids can wrap to other side
-    edge_distance_pct = 5 #* Distance before boids gets pushed back by the edges
+    edge_distance_pct = 2 #* Distance before boids gets pushed back by the edges
     follow_cursor = True #* If boids follow the on-screen cursor
 
     def __init__(self):
@@ -185,7 +188,7 @@ class Boid(Vehicle):
         steering = self.clamp_force(steering)
         return steering / 100
 
-    def seek_cursor(self): #uses pygame's get_pos to get xy coords of mouse
+    def seek_cursor(self): 
         mouse_pos = pg.mouse.get_pos()
         mouse_vec = pg.Vector2(mouse_pos)
         desired_velocity = mouse_vec - self.position
@@ -193,6 +196,15 @@ class Boid(Vehicle):
         steering = desired_velocity - self.velocity
         return self.clamp_force(steering)
 
+    def get_neighbors(self, boids):
+        neighbors = []
+        for boid in boids:
+            if boid != self:
+                dist = self.position.distance_to(boid.position)
+                if dist < self.perception:
+                    neighbors.append(boid)
+        return neighbors
+    
     def update(self, dt, boids):
         steering = pg.Vector2()
 
@@ -211,12 +223,3 @@ class Boid(Vehicle):
             steering += self.seek_cursor()
 
         super().update(dt, steering)
-
-    def get_neighbors(self, boids):
-        neighbors = []
-        for boid in boids:
-            if boid != self:
-                dist = self.position.distance_to(boid.position)
-                if dist < self.perception:
-                    neighbors.append(boid)
-        return neighbors
