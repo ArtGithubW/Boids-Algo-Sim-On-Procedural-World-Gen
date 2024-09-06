@@ -132,18 +132,18 @@ class Boid(Vehicle):
 
     # CONFIG
     min_speed = 0.05
-    max_speed = 0.30
+    max_speed = 0.20
     max_force = 1
     perception = 70 #* Distance where boids can "See" each other(Higher is bigger radius)
     crowding = 20 #* Distance between boids(lower is more crowded as there is less(no) seperation)
     can_wrap = False #* If boids can wrap to other side
-    edge_distance_pct = 10 #* Distance before boids gets pushed back by the edges
+    edge_distance_pct = 5 #* Distance before boids gets pushed back by the edges
     follow_cursor = True #* If boids follow the on-screen cursor
 
     def __init__(self):
         Boid.set_boundary(Boid.edge_distance_pct)
 
-        # Randomize starting position and velocity
+        # Randomizing starting position and velocity
         start_position = pg.math.Vector2(
             uniform(0, Boid.max_x),
             uniform(0, Boid.max_y))
