@@ -3,7 +3,7 @@
 ## Dependencies
 
 pip install pygame <br/>
-pip install pygame_gui
+pip install pygame_gui <br/>
 pip install numpy
 
 
