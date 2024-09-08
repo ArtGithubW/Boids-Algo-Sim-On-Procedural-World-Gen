@@ -2,15 +2,13 @@ import pygame as pg
 from random import uniform, randint
 
 
-import pygame as pg
-import random
 
 class Vehicle(pg.sprite.Sprite):
 
 
 
     image = pg.Surface((10, 10), pg.SRCALPHA)
-    pg.draw.polygon(image, "black", [(5, 5), (0, 2), (0, 5)])
+    pg.draw.polygon(image, "red", [(5, 5), (0, 2), (0, 5)])
 
     def __init__(self, position, velocity, min_speed, max_speed,
                  max_force, can_wrap):
@@ -90,9 +88,6 @@ class Vehicle(pg.sprite.Sprite):
             steering = pg.Vector2()
 
         return steering
-    
-    def avoid_extremes(self):       #TODO: Check if the current vehicle object is on top of any extreme terrain(OCEAN_DEEP, or SNOW)
-        return None
 
     def wrap(self):
         if self.position.x < 0:
@@ -145,7 +140,7 @@ class Boid(Vehicle):
             uniform(-1, 1) * Boid.max_speed,
             uniform(-1, 1) * Boid.max_speed)
 
-        super().__init__(start_position, start_velocity,
+        super().__init__(start_position, start_velocity,     #Calling vehicle constructor to initialize limits and constraints
                          Boid.min_speed, Boid.max_speed,
                          Boid.max_force, Boid.can_wrap)
 
@@ -196,7 +191,17 @@ class Boid(Vehicle):
                     neighbors.append(boid)
         return neighbors
     
-    def update(self, dt, boids):
+    def avoid_rectangle(self, rect):
+        # Find the center of the rectangle
+        rect_center = pg.Vector2(rect.center)
+
+        # Create a steering force away from the rectangle's center
+        steering = self.position - rect_center
+        steering = steering.normalize() * self.max_speed  # Normalize to maximum speed
+        steering -= self.velocity  # Calculate the steering force relative to current velocity
+        return self.clamp_force(steering)
+
+    def update(self, dt, boids, pygameRect):
         steering = pg.Vector2()
 
         if not self.can_wrap:
@@ -213,4 +218,7 @@ class Boid(Vehicle):
         if not self.follow_cursor:
             steering += self.seek_cursor()
 
+        if pygameRect.collidepoint((self.position.x,self.position.y)):
+            print("Collision!")
+            steering += self.avoid_rectangle(pygameRect)
         super().update(dt, steering)

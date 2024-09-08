@@ -4,14 +4,12 @@ import pygame as pg
 from pygame.locals import *
 import pygame_gui
 from boid import Boid
-sys.path.insert(1, './ProceduralGenWPerlinNoise')
-from ProceduralGenWPerlinNoise.helper import GenNoiseMap,GenIntMap
-from ProceduralGenWPerlinNoise.config import * 
 
-num_boids = 100
+
+num_boids = 10
 default_geometry = "720x480"
 
-def update(dt, boids, manager):
+def update(dt, boids, manager,white_rec):
     """
     Update game. Called once per frame.
     """
@@ -42,39 +40,27 @@ def update(dt, boids, manager):
         manager.process_events(event)
 
     for b in boids:
-        b.update(dt, boids)
-
+        b.update(dt, boids, white_rec)
     manager.update(dt)
 
-def draw(screen, background, boids, manager):
+def draw(screen, background, boids, manager,WHITE_RECT):
     """
     Draw things to the window. Called once per frame.
     """
     # Draw the background
+    
     screen.blit(background, (0, 0))
+    pg.draw.rect(screen,"white",WHITE_RECT)
     
     boids.draw(screen)
     manager.draw_ui(screen)
-
     pg.display.update()
     
 def main(args):
-    # Generates the map and turn it into a background
-    noise_map = GenNoiseMap()
-    map_int = GenIntMap(noise_map)
+    # Generates the map and turn it into a background)
     
-    background_surface = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
-
-
-    for y, row in enumerate(map_int):
-        for x, value in enumerate(row):
-
-            if x >= WINDOW_WIDTH or y >= WINDOW_HEIGHT:  # Check boundary conditions
-                continue
-            
-            # Use the color map to set individual pixel on the background surface
-            color = COLOR_MAP[value]
-            background_surface.set_at((x, y), color)
+    background_surface = pg.Surface((720, 480))
+    white_rect = pg.Rect(200,200,200,200)
             
     # Initialize pygame.
     pg.init()
@@ -91,7 +77,8 @@ def main(args):
     screen = pg.display.set_mode((window_width, window_height), flags)
     screen.set_alpha(None)
     manager = pygame_gui.UIManager((window_width, window_height))
-
+    
+    
     boids = pg.sprite.RenderUpdates()
 
     add_boids(boids, args.num_boids)
@@ -130,8 +117,10 @@ def main(args):
     dt = 1/fps  # dt is the time since last frame.
 
     while True:
-        update(dt, boids, manager)
-        draw(screen, background_surface, boids, manager)
+        update(dt, boids, manager,white_rect)
+        
+        draw(screen, background_surface, boids, manager,white_rect)
+        
         dt = fpsClock.tick(fps)
 
 
