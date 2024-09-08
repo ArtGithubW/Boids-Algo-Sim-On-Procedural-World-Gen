@@ -9,10 +9,10 @@ white noise: <br>
 gradient noise: <br>
 ![alt text](image-2.png)
 
-- We can use the gradient noise to create a height map and then map it to different materials.
-- Gradient noise above is in 1D but we can easily make it 2D using perlin noise
+- We can use the gradient/perlin noise to create a height map and then map it to different materials.
+- We can turn the generated 1D gradient/perlin noise into a 2D matrix
 
-We can make it so that perlin noise function can take in specified octaves. The higher the octaves, the higher the frequency of noise becomes
+Perlin noise function can take in specified octaves. The higher the octaves, the higher the frequency of noise becomes
 => We can combine several perlin noise function outputs with different octaves to create a final cohesive perlin noise map.
 
 How This Works:
