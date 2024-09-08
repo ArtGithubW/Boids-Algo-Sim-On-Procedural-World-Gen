@@ -14,3 +14,10 @@ pip install pygame_gui
 3. Cohesion(To make the boids move to the center of the flock)
 
 https://vanhunteradams.com/Pico/Animal_Movement/Boids-algorithm.html
+
+### Notes:
+
+- TODO LIST:
+
+* Implementing rectangle enlargement algoritm in test.py to detect extreme terrains
+* Combining the avoid extreme terrains function to main code
