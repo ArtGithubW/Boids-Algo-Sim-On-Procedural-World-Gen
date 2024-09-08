@@ -6,7 +6,7 @@ import pygame_gui
 from boid import Boid
 
 
-num_boids = 10
+num_boids = 100
 default_geometry = "720x480"
 
 def update(dt, boids, manager,white_rec):
@@ -43,14 +43,15 @@ def update(dt, boids, manager,white_rec):
         b.update(dt, boids, white_rec)
     manager.update(dt)
 
-def draw(screen, background, boids, manager,WHITE_RECT):
+def draw(screen, background, boids, manager,list_of_rects=None):
     """
     Draw things to the window. Called once per frame.
     """
     # Draw the background
-    
     screen.blit(background, (0, 0))
-    pg.draw.rect(screen,"white",WHITE_RECT)
+    
+    for i in range(len(list_of_rects)):
+        pg.draw.rect(screen,"white" if i == 0 else "blue",list_of_rects[i])
     
     boids.draw(screen)
     manager.draw_ui(screen)
@@ -61,14 +62,17 @@ def main(args):
     
     background_surface = pg.Surface((720, 480))
     white_rect = pg.Rect(200,200,200,200)
-            
+    blue_rect = pg.Rect(600,100,150,150)
+    
+    list_of_rects = [white_rect,blue_rect] #! TESTING
+    
+
     # Initialize pygame.
     pg.init()
 
     # Set up the clock to maintain a relatively constant framerate.
-    fps = 60.0
+    fps = 100.0
     fpsClock = pg.time.Clock()
-
     # Set up the window.
     pg.display.set_caption("Boids Sim")
     window_width, window_height = [int(x) for x in args.geometry.split("x")]
@@ -117,11 +121,11 @@ def main(args):
     dt = 1/fps  # dt is the time since last frame.
 
     while True:
-        update(dt, boids, manager,white_rect)
-        
-        draw(screen, background_surface, boids, manager,white_rect)
+        update(dt, boids, manager,list_of_rects)
+        draw(screen, background_surface, boids, manager,list_of_rects)
         
         dt = fpsClock.tick(fps)
+        print(fpsClock.get_fps())
 
 
 def add_boids(boids, num_boids):

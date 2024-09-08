@@ -196,12 +196,12 @@ class Boid(Vehicle):
         rect_center = pg.Vector2(rect.center)
 
         # Create a steering force away from the rectangle's center
-        steering = self.position - rect_center
+        steering = (self.position - rect_center)
         steering = steering.normalize() * self.max_speed  # Normalize to maximum speed
         steering -= self.velocity  # Calculate the steering force relative to current velocity
         return self.clamp_force(steering)
 
-    def update(self, dt, boids, pygameRect):
+    def update(self, dt, boids, list_of_rects):
         steering = pg.Vector2()
 
         if not self.can_wrap:
@@ -217,8 +217,8 @@ class Boid(Vehicle):
 
         if not self.follow_cursor:
             steering += self.seek_cursor()
-
-        if pygameRect.collidepoint((self.position.x,self.position.y)):
-            print("Collision!")
-            steering += self.avoid_rectangle(pygameRect)
+        for rect in list_of_rects:
+            if rect.collidepoint((self.position.x,self.position.y)):
+                # print("Collision!")
+                steering += self.avoid_rectangle(rect)
         super().update(dt, steering)

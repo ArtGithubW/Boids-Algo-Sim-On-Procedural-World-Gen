@@ -19,5 +19,5 @@ https://vanhunteradams.com/Pico/Animal_Movement/Boids-algorithm.html
 
 - TODO LIST:
 
-* Implementing rectangle enlargement algoritm in test.py to detect extreme terrains
+* figure out the numpy inhomogeneous shape after 1 dimension problem that is not consistent
 * Combining the avoid extreme terrains function to main code

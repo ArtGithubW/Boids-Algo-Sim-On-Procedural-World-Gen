@@ -7,9 +7,10 @@ from boid import Boid
 sys.path.insert(1, './ProceduralGenWPerlinNoise')
 from ProceduralGenWPerlinNoise.helper import GenNoiseMap,GenIntMap
 from ProceduralGenWPerlinNoise.config import * 
+from FindCenter import findCenters
 
 num_boids = 100
-default_geometry = "720x480"
+default_geometry = f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}"
 
 def update(dt, boids, manager):
     """
@@ -46,15 +47,18 @@ def update(dt, boids, manager):
 
     manager.update(dt)
 
-def draw(screen, background, boids, manager):
+def draw(screen, background, boids, manager,list_of_rects):
     """
     Draw things to the window. Called once per frame.
     """
     # Draw the background
     screen.blit(background, (0, 0))
-    
-    boids.draw(screen)
-    manager.draw_ui(screen)
+    for i in range(len(list_of_rects)):
+        pg.draw.rect(screen,"red",list_of_rects[i])
+    # boids.draw(screen)
+    # manager.draw_ui(screen)
+    # boids.draw(screen)
+    # manager.draw_ui(screen)
 
     pg.display.update()
     
@@ -62,6 +66,10 @@ def main(args):
     # Generates the map and turn it into a background
     noise_map = GenNoiseMap()
     map_int = GenIntMap(noise_map)
+    list_of_rects = []
+    for Index,Coords in enumerate(findCenters(map_int)): #Coords(x,y)
+        print(f"Center {Index}, Coords(Y:{Coords[0]}, X:{Coords[1]})")
+        list_of_rects.append(pg.Rect(Coords[1],Coords[0],20,20))
     
     background_surface = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
 
@@ -131,7 +139,7 @@ def main(args):
 
     while True:
         update(dt, boids, manager)
-        draw(screen, background_surface, boids, manager)
+        draw(screen, background_surface, boids, manager,list_of_rects)
         dt = fpsClock.tick(fps)
 
 
