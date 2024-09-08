@@ -1,13 +1,14 @@
-# Boids-Algo-Sim
+# Boids Algorithm Simulation on Procedural Generated World
 
 ## Dependencies
 
 pip install pygame <br/>
 pip install pygame_gui
+pip install numpy
 
-### This repo contains the boids algorithm simulated on pygame.
 
-- 3 Main concepts:
+
+## 3 Main concepts of Boid:
 
 1. Seperation(To make each boid not collide with eachother)
 2. Alignment(To make boids align with other boids' forward velocity)
@@ -15,6 +16,10 @@ pip install pygame_gui
 
 https://vanhunteradams.com/Pico/Animal_Movement/Boids-algorithm.html
 
+
+## Perlin noise:
+
+https://medium.com/nerd-for-tech/generating-digital-worlds-using-perlin-noise-5d11237c29e9
 ### Notes:
 
 - TODO LIST:
