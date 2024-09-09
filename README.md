@@ -4,7 +4,8 @@
 
 pip install pygame <br/>
 pip install pygame_gui <br/>
-pip install numpy
+pip install numpy <br/>
+pip install perlin_noise
 
 ## 3 Main concepts of Boid:
 
