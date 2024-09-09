@@ -1,14 +1,15 @@
 from perlin_noise import PerlinNoise
 from ProceduralGenWPerlinNoise.config import *
 
-
-# This function generates 4 perlin noises then add them all up into a 2d matrix
-def GenNoiseMap() -> list:
+"""
+This function generates 4 perlin noises then add them all up into a 2d matrix noise map
+"""
+def GenerateNoiseMap(Inputseed) -> list:
     noise_map = []
-    noise1 = PerlinNoise(octaves=3,seed = SEED) #
-    noise2 = PerlinNoise(octaves=6,seed = SEED) 
-    noise3 = PerlinNoise(octaves=12,seed = SEED)
-    noise4 = PerlinNoise(octaves=18,seed = SEED)
+    noise1 = PerlinNoise(octaves=3,seed = Inputseed) #
+    noise2 = PerlinNoise(octaves=6,seed = Inputseed) 
+    noise3 = PerlinNoise(octaves=12,seed = Inputseed)
+    noise4 = PerlinNoise(octaves=18,seed = Inputseed)
 
     x_loc, y_loc = WINDOW_WIDTH + 1, WINDOW_HEIGHT + 1
     for j in range(y_loc):
@@ -21,13 +22,10 @@ def GenNoiseMap() -> list:
             row.append(noise_val)
         noise_map.append(row)
     return noise_map
-
-
-
-# This function will calculate the threshold for each terrain and use the noise map to create an terrain map of integers
-def GenIntMap(NoiseMap) -> list:
-    max_value,min_value = 0.0,0.0
-
+"""
+This function returns the max heights of each of the terrain and also the minimum height of the whole noise map
+"""
+def GenerateMaxHeights(NoiseMap):
     flat_list = [item for sublist in NoiseMap for item in sublist]
     min_value,max_value = min(flat_list),max(flat_list)
     
@@ -43,7 +41,13 @@ def GenIntMap(NoiseMap) -> list:
         height = total_range * (TERRAINWEIGHT[terrain_type] / total_TERRAINWEIGHT) + previous_height #! Making sure next height is larger than last 
         max_terrain_heights.append(height)
         previous_height = height
-    # max_terrain_heights[SNOW] = max_value # Makes sure the SNOW is the last value in this list
+    max_terrain_heights[SNOW] = max_value # Makes sure the SNOW is the last value in this list
+    
+    return max_terrain_heights,min_value
+"""
+This function will calculate the threshold for each terrain and use the noise map to create an terrain map of integers
+"""
+def GenerateIntMap(NoiseMap,max_terrain_heights):
 
     terrain_int_map = []
 
@@ -56,3 +60,10 @@ def GenIntMap(NoiseMap) -> list:
                     break
         terrain_int_map.append(map_row) 
     return terrain_int_map
+
+
+"""
+This function takes a minimum and maximum and input and normalizes the input(0.0 to 1.0) based on the minimum and maximum
+"""
+def normalize_Zero_to_One(x, old_min, old_max, new_min = 0.0, new_max=1.0 ):
+    return (x - old_min) / (old_max - old_min) * (new_max - new_min) + new_min

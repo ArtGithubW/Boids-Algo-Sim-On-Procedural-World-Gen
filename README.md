@@ -6,8 +6,6 @@ pip install pygame <br/>
 pip install pygame_gui <br/>
 pip install numpy
 
-
-
 ## 3 Main concepts of Boid:
 
 1. Seperation(To make each boid not collide with eachother)
@@ -16,10 +14,10 @@ pip install numpy
 
 https://vanhunteradams.com/Pico/Animal_Movement/Boids-algorithm.html
 
-
 ## Perlin noise:
 
 https://medium.com/nerd-for-tech/generating-digital-worlds-using-perlin-noise-5d11237c29e9
+
 ### Notes:
 
 - TODO LIST:

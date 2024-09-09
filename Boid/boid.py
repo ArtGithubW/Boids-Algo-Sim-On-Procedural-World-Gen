@@ -1,13 +1,9 @@
+import sys
 import pygame as pg
 from random import uniform, randint
-
-
-import pygame as pg
-import random
+from config import * 
 
 class Vehicle(pg.sprite.Sprite):
-
-
 
     image = pg.Surface((10, 10), pg.SRCALPHA)
     pg.draw.polygon(image, "black", [(5, 5), (0, 2), (0, 5)])
@@ -90,9 +86,6 @@ class Vehicle(pg.sprite.Sprite):
             steering = pg.Vector2()
 
         return steering
-    
-    def avoid_extremes(self):       #TODO: Check if the current vehicle object is on top of any extreme terrain(OCEAN_DEEP, or SNOW)
-        return None
 
     def wrap(self):
         if self.position.x < 0:
@@ -105,6 +98,12 @@ class Vehicle(pg.sprite.Sprite):
         elif self.position.y > Vehicle.max_y:
             self.position.y -= Vehicle.max_y
 
+    def clamp_force(self, force):
+        if 0 < force.magnitude() > self.max_force:
+            force.scale_to_length(self.max_force)
+
+        return force
+    
     @staticmethod
     def set_boundary(edge_distance_pct):
         info = pg.display.Info()
@@ -115,24 +114,18 @@ class Vehicle(pg.sprite.Sprite):
         Vehicle.edges = [margin_w, margin_h, Vehicle.max_x - margin_w,
                          Vehicle.max_y - margin_h]
 
-    def clamp_force(self, force):
-        if 0 < force.magnitude() > self.max_force:
-            force.scale_to_length(self.max_force)
-
-        return force
 
 
 class Boid(Vehicle):
-
-    # CONFIG
-    min_speed = 0.05
-    max_speed = 0.20
-    max_force = 1
-    perception = 30 #* Distance where boids can "See" each other(Higher is bigger radius)
-    crowding = 10 #* Distance between boids(lower is more crowded as there is less(no) seperation)
-    can_wrap = False #* If boids can wrap to other side
-    edge_distance_pct = 2 #* Distance before boids gets pushed back by the edges
-    follow_cursor = True #* If boids follow the on-screen cursor
+    
+    follow_cursor = False
+    min_speed = MIN_SPEED 
+    max_speed = MAX_SPEED 
+    max_force = MAX_FORCE 
+    perception = PERCEPTION 
+    crowding = CROWDING 
+    can_wrap = CAN_WRAP 
+    edge_distance_pct = EDGE_DISTANCE_PCT 
 
     def __init__(self):
         Boid.set_boundary(Boid.edge_distance_pct)
@@ -179,7 +172,7 @@ class Boid(Vehicle):
         steering = self.clamp_force(steering)
         return steering / 100
 
-    def seek_cursor(self): 
+    def seek_cursor(self):  
         mouse_pos = pg.mouse.get_pos()
         mouse_vec = pg.Vector2(mouse_pos)
         desired_velocity = mouse_vec - self.position
@@ -196,6 +189,8 @@ class Boid(Vehicle):
                     neighbors.append(boid)
         return neighbors
     
+    
+    # Updates steering and calls Vehicle's update() to update the current position and velocity, why did I write it this way
     def update(self, dt, boids):
         steering = pg.Vector2()
 

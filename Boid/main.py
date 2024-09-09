@@ -4,17 +4,18 @@ import pygame as pg
 from pygame.locals import *
 import pygame_gui
 from boid import Boid
-sys.path.insert(1, './ProceduralGenWPerlinNoise')
-from ProceduralGenWPerlinNoise.helper import GenNoiseMap,GenIntMap
-from ProceduralGenWPerlinNoise.config import * 
+from config import * 
 from FindCenter import findCenters
+sys.path.insert(1, './ProceduralGenWPerlinNoise')
+from ProceduralGenWPerlinNoise.helper import *
+
 
 num_boids = 100
 default_geometry = f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}"
 
 def update(dt, boids, manager):
     """
-    Update game. Called once per frame.
+    Update boids and checks for button presses. Called once per frame.
     """
     for event in pg.event.get():
         if event.type == QUIT:
@@ -49,23 +50,32 @@ def update(dt, boids, manager):
 
 def draw(screen, background, boids, manager,list_of_rects):
     """
-    Draw things to the window. Called once per frame.
+    Draws everything to the window. Called once per frame.
     """
     # Draw the background
     screen.blit(background, (0, 0))
     for i in range(len(list_of_rects)):
         pg.draw.rect(screen,"red",list_of_rects[i])
-    # boids.draw(screen)
-    # manager.draw_ui(screen)
+
     # boids.draw(screen)
     # manager.draw_ui(screen)
 
     pg.display.update()
+
+# Function to get the interpolation between two colors using the heightmap factor
+def interpolate_color(color1, color2, Color_height):
+    return (
+        int(color1[0] + (color2[0] - color1[0]) * Color_height),
+        int(color1[1] + (color2[1] - color1[1]) * Color_height),
+        int(color1[2] + (color2[2] - color1[2]) * Color_height)
+    )
+
     
 def main(args):
     # Generates the map and turn it into a background
-    noise_map = GenNoiseMap()
-    map_int = GenIntMap(noise_map)
+    noise_map = GenerateNoiseMap(Inputseed=SEED)
+    max_terrain_heights,min_height = GenerateMaxHeights(noise_map)
+    map_int = GenerateIntMap(noise_map,max_terrain_heights)
     list_of_rects = []
     for Index,Coords in enumerate(findCenters(map_int)): #Coords(x,y)
         print(f"Center {Index}, Coords(Y:{Coords[0]}, X:{Coords[1]})")
@@ -80,8 +90,23 @@ def main(args):
             if x >= WINDOW_WIDTH or y >= WINDOW_HEIGHT:  # Check boundary conditions
                 continue
             
-            # Use the color map to set individual pixel on the background surface
-            color = COLOR_MAP[value]
+            # This switch case will create a float from 0 to 1 depending on the height of the terrain in respect to its min and max range
+            match value:
+                case 0:
+                    color_height = normalize_Zero_to_One(noise_map[y][x],min_height,max_terrain_heights[0])
+                case 1:
+                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[0],max_terrain_heights[1])
+                case 2:
+                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[1],max_terrain_heights[2])
+                case 3:
+                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[2],max_terrain_heights[3])
+                case 4:
+                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[3],max_terrain_heights[4])
+                case 5:
+                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[4],max_terrain_heights[5])
+                    
+            # Use the gradient color for each pixel
+            color = interpolate_color(GRADIENTS[value][0],GRADIENTS[value][1],color_height)  
             background_surface.set_at((x, y), color)
             
     # Initialize pygame.
@@ -104,8 +129,7 @@ def main(args):
 
     add_boids(boids, args.num_boids)
 
-    # Create UI manager
-
+    # UI manager to add buttons
     global add_boids_button, remove_boids_button, reset_boids_button,toggle_cursor_follow_button,Wrap_button
     add_boids_button = pygame_gui.elements.UIButton(
         relative_rect=pg.Rect((10, 10), (100, 30)),
