@@ -22,5 +22,6 @@ https://medium.com/nerd-for-tech/generating-digital-worlds-using-perlin-noise-5d
 
 - TODO LIST:
 
+* Add more details to the terrain to make it look less SMOOTH and more organic [Done?]
 * figure out the numpy inhomogeneous shape after 1 dimension problem that is not consistent
 * Combining the avoid extreme terrains function to main code

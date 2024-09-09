@@ -16,12 +16,12 @@ TERRAINWEIGHT =     [60, 30, 15, 40, 30, 20]
 TERRAINTYPE = [OCEAN_DEEP,OCEAN,BEACH,GRASS,MOUNT,SNOW]
     
 GRADIENTS = {
-    0: ((20, 58, 100), (50, 90, 105)),    # Ocean Deep (Darker to Dark)
-    1: ((50, 90, 105), (99, 185, 215)),   # Ocean (Dark to Light)
-    2: ((200, 170, 80), (255, 213, 104)), # Beach (Dark to Light)
-    3: ((60, 130, 44), (82, 164, 54)),    # Grass (Dark to Light)
-    4: ((80, 80, 80), (120, 119, 124)),   # Mountain (Dark to Light)
-    5: ((200, 200, 200), (255, 255, 255)) # Snow (Grayish to White)
+    0: ((30, 176, 250), (38, 240, 250)),    # Ocean Deep (Darker to Dark)
+    1: ((38, 240, 250), (40, 253, 255)),   # Ocean (Dark to Light)
+    2: ((230, 210, 171), (255, 243, 190)), # Beach (Dark to Light)
+    3: ((20, 177, 150), (102, 233, 127)),    # Grass (Dark to Light)
+    4: ((73, 72, 72), (120, 119, 124)),   # Mountain (Dark to Light)
+    5: ((224, 224, 224), (255, 255, 255)) # Snow (Grayish to White)
 }
 
 #! Boid Configs

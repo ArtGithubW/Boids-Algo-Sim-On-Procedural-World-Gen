@@ -1,15 +1,19 @@
 from perlin_noise import PerlinNoise
-from ProceduralGenWPerlinNoise.config import *
+from config import *
 
 """
-This function generates 4 perlin noises then add them all up into a 2d matrix noise map
+This function generates perlin noises then add them all up into a 2d matrix noise map
 """
+#! This perlin noise library does not have fall off support so I'll just make more noises at higher octaves and add them up at lower values :P
 def GenerateNoiseMap(Inputseed) -> list:
     noise_map = []
-    noise1 = PerlinNoise(octaves=3,seed = Inputseed) #
+    noise1 = PerlinNoise(octaves=3,seed = Inputseed) 
     noise2 = PerlinNoise(octaves=6,seed = Inputseed) 
     noise3 = PerlinNoise(octaves=12,seed = Inputseed)
-    noise4 = PerlinNoise(octaves=18,seed = Inputseed)
+    noise4 = PerlinNoise(octaves=25,seed = Inputseed)
+    noise5 = PerlinNoise(octaves=50,seed = Inputseed) # Adding a 5th noise makes the space looks so much more organic....my lord the time it takes to run though
+    noise6 = PerlinNoise(octaves=80,seed = Inputseed) # screw it, 6th noise :D
+    
 
     x_loc, y_loc = WINDOW_WIDTH + 1, WINDOW_HEIGHT + 1
     for j in range(y_loc):
@@ -19,6 +23,8 @@ def GenerateNoiseMap(Inputseed) -> list:
             noise_val += 0.5 * noise2([i/x_loc, j/y_loc])   # the remaining adds to main curve
             noise_val += 0.25 * noise3([i/x_loc, j/y_loc])  
             noise_val += 0.125 * noise4([i/x_loc, j/y_loc])
+            noise_val += 0.0625 * noise5([i/x_loc, j/y_loc])
+            noise_val += 0.003125 * noise6([i/x_loc, j/y_loc])
             row.append(noise_val)
         noise_map.append(row)
     return noise_map
@@ -65,5 +71,5 @@ def GenerateIntMap(NoiseMap,max_terrain_heights):
 """
 This function takes a minimum and maximum and input and normalizes the input(0.0 to 1.0) based on the minimum and maximum
 """
-def normalize_Zero_to_One(x, old_min, old_max, new_min = 0.0, new_max=1.0 ):
-    return (x - old_min) / (old_max - old_min) * (new_max - new_min) + new_min
+def normalize_Zero_to_One(inputVal, old_min, old_max, new_min = 0.0, new_max=1.0 ):
+    return (inputVal - old_min) / (old_max - old_min) * (new_max - new_min) + new_min
