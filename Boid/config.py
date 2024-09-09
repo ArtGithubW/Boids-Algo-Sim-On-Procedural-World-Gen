@@ -1,6 +1,6 @@
 #! Window Dimensions
 WINDOW_WIDTH = 800 
-WINDOW_HEIGHT = 700
+WINDOW_HEIGHT = 600
 
 #! Terrain and color configs:
 SNOW = 5
@@ -11,8 +11,8 @@ OCEAN = 1
 OCEAN_DEEP = 0
 
         
-SEED = 9 #For consistency for now 9 is best
-TERRAINWEIGHT =     [60, 30, 15, 40, 30, 20]      
+SEED = 9 #For consistency for now 9 is best, 12 is also good
+TERRAINWEIGHT =     [70, 30, 15, 40, 30, 20]      
 TERRAINTYPE = [OCEAN_DEEP,OCEAN,BEACH,GRASS,MOUNT,SNOW]
     
 GRADIENTS = {

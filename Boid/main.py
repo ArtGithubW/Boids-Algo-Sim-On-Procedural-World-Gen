@@ -1,17 +1,16 @@
-import argparse
 import sys
 import pygame as pg
 from pygame.locals import *
 import pygame_gui
 from boid import Boid
 from config import * 
-from FindCenter import findCenters
+from FindCenter import findCoords
 sys.path.insert(1, './ProceduralGenWPerlinNoise')
 from ProceduralGenWPerlinNoise.helper import *
 
 
 num_boids = 100
-default_geometry = f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}"
+geometry = f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}"
 
 def update(dt, boids, manager):
     """
@@ -57,8 +56,7 @@ def draw(screen, background, boids, manager,list_of_rects):
     for i in range(len(list_of_rects)):
         pg.draw.rect(screen,"red",list_of_rects[i])
 
-    # boids.draw(screen)
-    # manager.draw_ui(screen)
+
 
     pg.display.update()
 
@@ -71,15 +69,26 @@ def interpolate_color(color1, color2, Color_height):
     )
 
     
-def main(args):
-    # Generates the map and turn it into a background
+def main():
+    # Init the world generation
     noise_map = GenerateNoiseMap(Inputseed=SEED)
     max_terrain_heights,min_height = GenerateMaxHeights(noise_map)
     map_int = GenerateIntMap(noise_map,max_terrain_heights)
+    
+    
+    #Generate boxes that bois will aboid
+    RectDicts = findCoords(map_int)
+
     list_of_rects = []
-    for Index,Coords in enumerate(findCenters(map_int)): #Coords(x,y)
-        print(f"Center {Index}, Coords(Y:{Coords[0]}, X:{Coords[1]})")
-        list_of_rects.append(pg.Rect(Coords[1],Coords[0],20,20))
+    for Index,CoordDict in enumerate(RectDicts): #Coords(x,y)
+        print(f"Center {Index}, Coords(Y:{CoordDict['center'][0]}, X:{CoordDict['center'][1]})")
+    
+        #! I def messed up somewhere here but the data struct is actually (y,x)?????? BUT EVERYTHING WORKS so EHHHH.
+        list_of_rects.append(pg.Rect(RectDicts[Index]["center"][1],RectDicts[Index]["center"][0],1,1))
+        inflate_x = RectDicts[Index]["rightmost"][1]-RectDicts[Index]["leftmost"][1] + 20
+        inflate_y = RectDicts[Index]["bottommost"][0]-RectDicts[Index]["topmost"][0] + 20
+        list_of_rects[Index].inflate_ip(inflate_x,inflate_y)
+
     
     background_surface = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
 
@@ -118,7 +127,7 @@ def main(args):
 
     # Set up the window.
     pg.display.set_caption("Boids Sim")
-    window_width, window_height = [int(x) for x in args.geometry.split("x")]
+    window_width, window_height = [int(x) for x in geometry.split("x")]
     flags = DOUBLEBUF # Supposedly increases framerate
 
     screen = pg.display.set_mode((window_width, window_height), flags)
@@ -127,7 +136,7 @@ def main(args):
 
     boids = pg.sprite.RenderUpdates()
 
-    add_boids(boids, args.num_boids)
+    add_boids(boids, num_boids)
 
     # UI manager to add buttons
     global add_boids_button, remove_boids_button, reset_boids_button,toggle_cursor_follow_button,Wrap_button
@@ -172,11 +181,4 @@ def add_boids(boids, num_boids):
         boids.add(Boid())
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Emergent flocking.')
-    parser.add_argument('--geometry', metavar='WxH', type=str,
-                        default=default_geometry, help='geometry of window')
-    parser.add_argument('--number', dest='num_boids', type=int, default=num_boids,
-                        help='number of boids to generate')
-    args = parser.parse_args()
-
-    main(args)
+    main()

@@ -34,7 +34,7 @@ while running:
     # Increase the size of the rectangle
     # width += growth_rate
     # height += growth_rate
-    width,height = 200,200
+    width,height = 20,20
     # if width >= 200:
     #     running = False
         
@@ -44,6 +44,8 @@ while running:
 
     rect_object = pg.Rect(rect_x, rect_y, width, height)
     # Draw the expanding rectangle
+    rect_object.inflate_ip(200,100)
+    print(rect_object.topright)
     pg.draw.rect(screen,rec_color,rect_object)
 
     # Update the display

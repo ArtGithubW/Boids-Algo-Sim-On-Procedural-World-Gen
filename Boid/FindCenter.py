@@ -16,6 +16,7 @@ def bfs(matrix, start, visited):
                     queue.append((nx, ny))
     return component
 
+# This function returns a list of (x,y) coords that have the map_int value of 5 that are connected to each other
 def find_clumps(matrix):
     visited = set()
     clumps = []
@@ -26,24 +27,34 @@ def find_clumps(matrix):
                 clumps.append(component)
     return clumps
 
-def get_clump_centers(clumps):
-    centers = []
+
+# This function returns the center,left,right,top,and bottom coords of all the clumps
+def get_clump_centers_and_extremes(clumps):
+    centers_and_extremes = []
     for clump in clumps:
-        coords = np.array(clump)
-        avg_x = np.mean(coords[:, 0])
-        avg_y = np.mean(coords[:, 1])
-        centers.append((int(round(avg_x)), int(round(avg_y))))
-    return centers
+        
+        leftmost = min(clump, key=lambda p: p[1])  
+        rightmost = max(clump, key=lambda p: p[1]) 
+        topmost = min(clump, key=lambda p: p[0])   
+        bottommost = max(clump, key=lambda p: p[0])
+        center = ((bottommost[0]+topmost[0])//2,(rightmost[1]+leftmost[1])//2)
+        centers_and_extremes.append({
+            'center': center,
+            'leftmost': leftmost,
+            'rightmost': rightmost,
+            'topmost': topmost,
+            'bottommost': bottommost
+        })
+    return centers_and_extremes
 
 
-def findCenters(matrix):
+# This function returns a list of dicts that contain a clump's center, top,left,right,bottom coords
+def findCoords(matrix):
 
     # Convert the matrix to a NumPy array
     matrix_np = np.array(matrix)
-
-    # Find clumps and their centers
     clumps = find_clumps(matrix_np)
-    centers = get_clump_centers(clumps)
+    centers_and_extremes = get_clump_centers_and_extremes(clumps)
 
-    # Print the centers
-    return centers
+    # Return the centers and extreme points
+    return centers_and_extremes
