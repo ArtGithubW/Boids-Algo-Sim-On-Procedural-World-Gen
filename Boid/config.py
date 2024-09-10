@@ -3,6 +3,9 @@ WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 
 #! Terrain and color configs:
+debug = False
+
+
 SNOW = 5
 MOUNT = 4
 GRASS = 3
@@ -27,9 +30,12 @@ GRADIENTS = {
 #! Boid Configs
 
 MIN_SPEED = 0.05
-MAX_SPEED = 0.20
+MAX_SPEED = 0.10
 MAX_FORCE = 1
 PERCEPTION = 30         #* Distance where boids can "See" each other(Higher is bigger radius)
-CROWDING = 10           #* Distance between boids(lower is more crowded as there is less(no) seperation)
+CROWDING = 6           #* Distance between boids(lower is more crowded as there is less(no) seperation)
 CAN_WRAP = False        #* If boids can wrap to other side
 EDGE_DISTANCE_PCT = 2   #* Distance before boids gets pushed back by the edges
+
+
+

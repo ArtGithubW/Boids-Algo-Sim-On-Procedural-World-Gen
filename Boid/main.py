@@ -8,68 +8,9 @@ from FindCenter import findCoords
 sys.path.insert(1, './ProceduralGenWPerlinNoise')
 from ProceduralGenWPerlinNoise.helper import *
 
-
-num_boids = 100
-geometry = f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}"
-
-def update(dt, boids, manager):
-    """
-    Update boids and checks for button presses. Called once per frame.
-    """
-    for event in pg.event.get():
-        if event.type == QUIT:
-            pg.quit()
-            sys.exit(0)
-        elif event.type == pygame_gui.UI_BUTTON_PRESSED:
-            if event.ui_element == add_boids_button:
-                add_boids(boids, 10)
-                print("Added 10 Boids")
-            elif event.ui_element == remove_boids_button:
-                boids.remove(boids.sprites()[:10])
-                print("RM'd 10 Boids")
-            elif event.ui_element == reset_boids_button:
-                num_boids = len(boids)
-                boids.empty()
-                add_boids(boids, num_boids)
-                print("Reset Boids")
-            elif event.ui_element == toggle_cursor_follow_button:
-                for boid in boids:
-                    boid.follow_cursor = not boid.follow_cursor
-                print(f"Follow Cursor: {not boid.follow_cursor}")
-            elif event.ui_element == Wrap_button:
-                for boid in boids:
-                    boid.can_wrap = not boid.can_wrap
-                print(f"Wrap?: {boid.can_wrap}")
-        manager.process_events(event)
-
-    for b in boids:
-        b.update(dt, boids)
-
-    manager.update(dt)
-
-def draw(screen, background, boids, manager,list_of_rects):
-    """
-    Draws everything to the window. Called once per frame.
-    """
-    # Draw the background
-    screen.blit(background, (0, 0))
-    for i in range(len(list_of_rects)):
-        pg.draw.rect(screen,"red",list_of_rects[i])
-
-
-
-    pg.display.update()
-
-# Function to get the interpolation between two colors using the heightmap factor
-def interpolate_color(color1, color2, Color_height):
-    return (
-        int(color1[0] + (color2[0] - color1[0]) * Color_height),
-        int(color1[1] + (color2[1] - color1[1]) * Color_height),
-        int(color1[2] + (color2[2] - color1[2]) * Color_height)
-    )
-
-    
 def main():
+    
+    num_boids = 100
     # Init the world generation
     noise_map = GenerateNoiseMap(Inputseed=SEED)
     max_terrain_heights,min_height = GenerateMaxHeights(noise_map)
@@ -91,7 +32,6 @@ def main():
 
     
     background_surface = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
-
 
     for y, row in enumerate(map_int):
         for x, value in enumerate(row):
@@ -127,7 +67,7 @@ def main():
 
     # Set up the window.
     pg.display.set_caption("Boids Sim")
-    window_width, window_height = [int(x) for x in geometry.split("x")]
+    window_width, window_height = WINDOW_WIDTH,WINDOW_HEIGHT
     flags = DOUBLEBUF # Supposedly increases framerate
 
     screen = pg.display.set_mode((window_width, window_height), flags)
@@ -139,7 +79,7 @@ def main():
     add_boids(boids, num_boids)
 
     # UI manager to add buttons
-    global add_boids_button, remove_boids_button, reset_boids_button,toggle_cursor_follow_button,Wrap_button
+    global add_boids_button, remove_boids_button, reset_boids_button,toggle_cursor_follow_button,Wrap_button,debug_button
     add_boids_button = pygame_gui.elements.UIButton(
         relative_rect=pg.Rect((10, 10), (100, 30)),
         text='Add Boids',
@@ -165,16 +105,79 @@ def main():
         text='Tog Wrap',
         manager=manager
     )
+    debug_button = pygame_gui.elements.UIButton(
+        relative_rect=pg.Rect((120, 70), (100, 30)),
+        text='Debug',
+        manager=manager
+    )
     
 
     # Main game loop.
     dt = 1/fps  # dt is the time since last frame.
 
     while True:
-        update(dt, boids, manager)
+        update(dt, boids, manager,list_of_rects)
         draw(screen, background_surface, boids, manager,list_of_rects)
         dt = fpsClock.tick(fps)
+        
+# This function updates the boids(and rectangle locations),pygame_gui buttons
+def update(dt, boids, manager,list_of_rects):
+    global debug
+    for event in pg.event.get():
+        if event.type == QUIT:
+            pg.quit()
+            sys.exit(0)
+        elif event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == add_boids_button:
+                add_boids(boids, 10)
+                print("Added 10 Boids")
+            elif event.ui_element == remove_boids_button:
+                boids.remove(boids.sprites()[:10])
+                print("RM'd 10 Boids")
+            elif event.ui_element == reset_boids_button:
+                num_boids = len(boids)
+                boids.empty()
+                add_boids(boids, num_boids)
+                print("Reset Boids")
+            elif event.ui_element == toggle_cursor_follow_button:
+                for boid in boids:
+                    boid.follow_cursor = not boid.follow_cursor
+                print(f"Follow Cursor: {not boid.follow_cursor}")
+            elif event.ui_element == Wrap_button:
+                for boid in boids:
+                    boid.can_wrap = not boid.can_wrap
+                print(f"Wrap?: {boid.can_wrap}")
+            elif event.ui_element == debug_button:
+                debug = not debug
+                print(f"Debug Mode: {debug}")
+        manager.process_events(event)
 
+    for b in boids:
+        b.update(dt, boids,list_of_rects)
+
+    manager.update(dt)
+
+# Draws everything onto the main screen every frame
+def draw(screen, background, boids, manager,list_of_rects):
+    global debug
+    # Draw the background
+    screen.blit(background, (0, 0))
+    
+    if debug:
+        for i in range(len(list_of_rects)):
+            pg.draw.rect(screen,"red",list_of_rects[i])
+    boids.draw(screen)
+    manager.draw_ui(screen)
+    
+    pg.display.update()
+
+# Function to get the interpolation between two colors using the heightmap factor
+def interpolate_color(color1, color2, Color_height):
+    return (
+        int(color1[0] + (color2[0] - color1[0]) * Color_height),
+        int(color1[1] + (color2[1] - color1[1]) * Color_height),
+        int(color1[2] + (color2[2] - color1[2]) * Color_height)
+    )
 
 def add_boids(boids, num_boids):
     for _ in range(num_boids):

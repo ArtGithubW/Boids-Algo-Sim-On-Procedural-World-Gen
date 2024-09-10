@@ -6,7 +6,8 @@ from config import *
 class Vehicle(pg.sprite.Sprite):
 
     image = pg.Surface((10, 10), pg.SRCALPHA)
-    pg.draw.polygon(image, "black", [(5, 5), (0, 2), (0, 5)])
+    # The color is black but it is half transparent
+    pg.draw.polygon(image, (0, 0, 0, 128), [(3, 3), (0, 1), (0, 3)])
 
     def __init__(self, position, velocity, min_speed, max_speed,
                  max_force, can_wrap):
@@ -190,8 +191,18 @@ class Boid(Vehicle):
         return neighbors
     
     
+    def avoid_rectangle(self, rect):
+        # Find the center of the rectangle
+        rect_center = pg.Vector2(rect.center)
+
+        # Create a steering force away from the rectangle's center
+        steering = (self.position - rect_center)
+        steering = steering.normalize() * self.max_speed  # Normalize to maximum speed
+        steering -= self.velocity  # Calculate the steering force relative to current velocity
+        return self.clamp_force(steering)
+
     # Updates steering and calls Vehicle's update() to update the current position and velocity, why did I write it this way
-    def update(self, dt, boids):
+    def update(self, dt, boids, list_of_rects):
         steering = pg.Vector2()
 
         if not self.can_wrap:
@@ -205,7 +216,10 @@ class Boid(Vehicle):
 
             steering += separation + alignment + cohesion
 
-        if not self.follow_cursor:
+        if  self.follow_cursor:
             steering += self.seek_cursor()
-
+        for rect in list_of_rects:
+            if rect.collidepoint((self.position.x,self.position.y)):
+                # print("Collision!")
+                steering += self.avoid_rectangle(rect)
         super().update(dt, steering)

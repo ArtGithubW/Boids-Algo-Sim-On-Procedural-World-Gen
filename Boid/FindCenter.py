@@ -22,7 +22,7 @@ def find_clumps(matrix):
     clumps = []
     for x in range(matrix.shape[0]):
         for y in range(matrix.shape[1]):
-            if matrix[x, y] == 5 and (x, y) not in visited:
+            if (matrix[x, y] == 5 and (x, y) not in visited):
                 component = bfs(matrix, (x, y), visited)
                 clumps.append(component)
     return clumps

@@ -1,5 +1,12 @@
 # Boids Algorithm Simulation on Procedural Generated World
 
+## Features
+
+This repo simulates flocks of birds flying around in a procedurally generated world. <br/>
+Birds will avoid extremely high terrain like top of mountains. <br/>
+There are some settings that the user can tweak and play around with.<br/>
+More technical configurations is located in /Boid/config.py
+
 ## Dependencies
 
 pip install pygame <br/>
@@ -22,7 +29,4 @@ https://medium.com/nerd-for-tech/generating-digital-worlds-using-perlin-noise-5d
 ### Notes:
 
 - TODO LIST:
-
-* Add more details to the terrain to make it look less SMOOTH and more organic [Done?]
-* figure out the numpy inhomogeneous shape after 1 dimension problem that is not consistent
-* Combining the avoid extreme terrains function to main code
+  figure out the numpy inhomogeneous shape after 1 dimension problem that is not consistent problem
