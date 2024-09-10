@@ -15,7 +15,7 @@ OCEAN_DEEP = 0
 
         
 SEED = 9 #For consistency for now 9 is best, 12 is also good
-TERRAINWEIGHT =     [70, 30, 15, 40, 30, 20]      
+TERRAINWEIGHT =     [70, 20, 15, 40, 30, 20]      
 TERRAINTYPE = [OCEAN_DEEP,OCEAN,BEACH,GRASS,MOUNT,SNOW]
     
 GRADIENTS = {

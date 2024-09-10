@@ -19,18 +19,11 @@ class Vehicle(pg.sprite.Sprite):
         self.max_speed = max_speed
         self.max_force = max_force
 
-        # set position
-        dimensions = len(position)
-        assert (1 < dimensions < 4), "Bad spawn"
 
-        if dimensions == 2:
-            self.position = pg.Vector2(position)
-            self.acceleration = pg.Vector2(0, 0)
-            self.velocity = pg.Vector2(velocity)
-        else:
-            self.position = pg.Vector3(position)
-            self.acceleration = pg.Vector3(0, 0, 0)
-            self.velocity = pg.Vector3(velocity)
+        self.position = pg.Vector2(position)
+        self.acceleration = pg.Vector2(0, 0)
+        self.velocity = pg.Vector2(velocity)
+
 
         self.heading = 0.0
 
@@ -100,7 +93,7 @@ class Vehicle(pg.sprite.Sprite):
             self.position.y -= Vehicle.max_y
 
     def clamp_force(self, force):
-        if 0 < force.magnitude() > self.max_force:
+        if force.magnitude() > self.max_force:
             force.scale_to_length(self.max_force)
 
         return force
@@ -148,7 +141,7 @@ class Boid(Vehicle):
 
     def separation(self, boids):
         steering = pg.Vector2()
-        for boid in boids: #? For each individual boid 
+        for boid in boids: 
             dist = self.position.distance_to(boid.position)
             if (dist < self.crowding and self.crowding > 0):
                 steering -= (boid.position - self.position)
@@ -177,7 +170,6 @@ class Boid(Vehicle):
         mouse_pos = pg.mouse.get_pos()
         mouse_vec = pg.Vector2(mouse_pos)
         desired_velocity = mouse_vec - self.position
-        desired_velocity = desired_velocity.normalize() * self.max_speed
         steering = desired_velocity - self.velocity
         return self.clamp_force(steering)
 
@@ -192,12 +184,11 @@ class Boid(Vehicle):
     
     
     def avoid_rectangle(self, rect):
-        # Find the center of the rectangle
+        # 2d vector from the center of the rectangle outwards
         rect_center = pg.Vector2(rect.center)
 
         # Create a steering force away from the rectangle's center
         steering = (self.position - rect_center)
-        steering = steering.normalize() * self.max_speed  # Normalize to maximum speed
         steering -= self.velocity  # Calculate the steering force relative to current velocity
         return self.clamp_force(steering)
 

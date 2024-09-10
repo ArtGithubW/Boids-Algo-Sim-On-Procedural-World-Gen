@@ -29,4 +29,6 @@ https://medium.com/nerd-for-tech/generating-digital-worlds-using-perlin-noise-5d
 ### Notes:
 
 - TODO LIST:
-  figure out the numpy inhomogeneous shape after 1 dimension problem that is not consistent problem
+  figure out the numpy inhomogeneous shape after 1 dimension problem that is not consistent problem, caused by switching resolution <br/>
+  combine colliding pygame.Rect objects into 1 object to optimize performance
+  optimize world gen speed

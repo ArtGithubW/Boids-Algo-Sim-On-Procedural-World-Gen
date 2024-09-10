@@ -5,10 +5,13 @@ import pygame_gui
 from boid import Boid
 from config import * 
 from FindCenter import findCoords
+import time
+
 sys.path.insert(1, './ProceduralGenWPerlinNoise')
 from ProceduralGenWPerlinNoise.helper import *
 
 def main():
+    start_time = time.time()
     
     num_boids = 100
     # Init the world generation
@@ -16,20 +19,22 @@ def main():
     max_terrain_heights,min_height = GenerateMaxHeights(noise_map)
     map_int = GenerateIntMap(noise_map,max_terrain_heights)
     
+    gen_time = time.time()
+    print(f"Time to generate Int Map: {gen_time - start_time}")
     
     #Generate boxes that bois will aboid
     RectDicts = findCoords(map_int)
 
     list_of_rects = []
     for Index,CoordDict in enumerate(RectDicts): #Coords(x,y)
-        print(f"Center {Index}, Coords(Y:{CoordDict['center'][0]}, X:{CoordDict['center'][1]})")
+        # print(f"Center {Index}, Coords(Y:{CoordDict['center'][0]}, X:{CoordDict['center'][1]})")
     
         #! I def messed up somewhere here but the data struct is actually (y,x)?????? BUT EVERYTHING WORKS so EHHHH.
         list_of_rects.append(pg.Rect(RectDicts[Index]["center"][1],RectDicts[Index]["center"][0],1,1))
         inflate_x = RectDicts[Index]["rightmost"][1]-RectDicts[Index]["leftmost"][1] + 20
         inflate_y = RectDicts[Index]["bottommost"][0]-RectDicts[Index]["topmost"][0] + 20
         list_of_rects[Index].inflate_ip(inflate_x,inflate_y)
-
+    
     
     background_surface = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
 
@@ -58,6 +63,8 @@ def main():
             color = interpolate_color(GRADIENTS[value][0],GRADIENTS[value][1],color_height)  
             background_surface.set_at((x, y), color)
             
+            
+    print(f"Time taken to generate world: {time.time() - gen_time}")
     # Initialize pygame.
     pg.init()
 
