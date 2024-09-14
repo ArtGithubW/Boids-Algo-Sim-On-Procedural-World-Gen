@@ -9,8 +9,8 @@ def bfs(matrix, start, visited):
         if (x, y) not in visited:
             visited.add((x, y))
             component.append((x, y))
-            # Check all 4-connected neighbors
-            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            # Checks for all 8 neighbors surrounding it to avoid for edge case of diagonals.
+            for dx, dy in [(-1,-1), (-1, 0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]:
                 nx, ny = x + dx, y + dy
                 if 0 <= nx < matrix.shape[0] and 0 <= ny < matrix.shape[1] and matrix[nx, ny] == 5:
                     queue.append((nx, ny))
