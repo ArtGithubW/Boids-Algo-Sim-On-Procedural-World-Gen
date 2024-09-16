@@ -1,6 +1,6 @@
 #! Window Dimensions
-WINDOW_WIDTH = 800 
-WINDOW_HEIGHT = 600
+WINDOW_WIDTH = 600 
+WINDOW_HEIGHT = 500
 
 #! Terrain and color configs:
 debug = False

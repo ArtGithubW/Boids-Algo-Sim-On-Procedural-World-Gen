@@ -1,6 +1,6 @@
 import sys
 import pygame as pg
-from pygame.locals import *
+from pygame.locals import DOUBLEBUF,QUIT
 import pygame_gui
 from boid import Boid
 from config import * 
@@ -67,19 +67,19 @@ def main():
     print(f"Time taken to generate world: {time.time() - gen_time}")
     # Initialize pygame.
     pg.init()
-
+    
     # Set up the clock to maintain a relatively constant framerate.
     fps = 60.0
     fpsClock = pg.time.Clock()
 
     # Set up the window.
     pg.display.set_caption("Boids Sim")
-    window_width, window_height = WINDOW_WIDTH,WINDOW_HEIGHT
-    flags = DOUBLEBUF # Supposedly increases framerate
 
-    screen = pg.display.set_mode((window_width, window_height), flags)
+    flags = DOUBLEBUF # Supposedly increases framerate
+     
+    screen = pg.display.set_mode((WINDOW_WIDTH+120, WINDOW_HEIGHT), flags)
     screen.set_alpha(None)
-    manager = pygame_gui.UIManager((window_width, window_height))
+    manager = pygame_gui.UIManager((WINDOW_WIDTH+120, WINDOW_HEIGHT))
 
     boids = pg.sprite.RenderUpdates()
 
@@ -88,37 +88,36 @@ def main():
     # UI manager to add buttons
     global add_boids_button, remove_boids_button, reset_boids_button,toggle_cursor_follow_button,Wrap_button,debug_button
     add_boids_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((10, 10), (100, 30)),
+        relative_rect=pg.Rect((WINDOW_WIDTH + 10, 10), (100, 30)),
         text='Add Boids',
         manager=manager
     )
     remove_boids_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((10, 40), (100, 30)),
+        relative_rect=pg.Rect((WINDOW_WIDTH +10, 40), (100, 30)),
         text='Remove Boids',
         manager=manager
     )
     reset_boids_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((10, 70), (100, 30)),
+        relative_rect=pg.Rect((WINDOW_WIDTH +10, 70), (100, 30)),
         text='Reset Boids',
         manager=manager
     )
     toggle_cursor_follow_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((120, 10), (100, 30)),
+        relative_rect=pg.Rect((WINDOW_WIDTH +10, 100), (100, 30)),
         text='Tog F-Cursor',
         manager=manager
     )
     Wrap_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((120, 40), (100, 30)),
+        relative_rect=pg.Rect((WINDOW_WIDTH +10, 130), (100, 30)),
         text='Tog Wrap',
         manager=manager
     )
     debug_button = pygame_gui.elements.UIButton(
-        relative_rect=pg.Rect((120, 70), (100, 30)),
+        relative_rect=pg.Rect((WINDOW_WIDTH +10, 160), (100, 30)),
         text='Debug',
         manager=manager
     )
     
-
     # Main game loop.
     dt = 1/fps  # dt is the time since last frame.
 
