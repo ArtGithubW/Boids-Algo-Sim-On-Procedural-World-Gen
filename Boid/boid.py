@@ -3,7 +3,7 @@ import pygame as pg
 from random import uniform, randint
 from config import * 
 
-class Vehicle(pg.sprite.Sprite):
+class Vehicle(pg.sprite.DirtySprite):
 
     image = pg.Surface((10, 10), pg.SRCALPHA)
     # The color is black but it is half transparent
@@ -100,9 +100,8 @@ class Vehicle(pg.sprite.Sprite):
     
     @staticmethod
     def set_boundary(edge_distance_pct):
-        info = pg.display.Info()
-        Vehicle.max_x = info.current_w
-        Vehicle.max_y = info.current_h
+        Vehicle.max_x = WINDOW_WIDTH
+        Vehicle.max_y = WINDOW_HEIGHT
         margin_w = Vehicle.max_x * edge_distance_pct / 100
         margin_h = Vehicle.max_y * edge_distance_pct / 100
         Vehicle.edges = [margin_w, margin_h, Vehicle.max_x - margin_w,
@@ -112,7 +111,6 @@ class Vehicle(pg.sprite.Sprite):
 
 class Boid(Vehicle):
     
-    follow_cursor = False
     min_speed = MIN_SPEED 
     max_speed = MAX_SPEED 
     max_force = MAX_FORCE 
@@ -164,7 +162,7 @@ class Boid(Vehicle):
         steering /= len(boids)
         steering -= self.position
         steering = self.clamp_force(steering)
-        return steering / 100
+        return steering / 120
 
     def seek_cursor(self):  
         mouse_pos = pg.mouse.get_pos()
@@ -193,7 +191,7 @@ class Boid(Vehicle):
         return self.clamp_force(steering)
 
     # Updates steering and calls Vehicle's update() to update the current position and velocity, why did I write it this way
-    def update(self, dt, boids, list_of_rects):
+    def update(self, dt, boids, list_of_rects,follow_cursor):
         steering = pg.Vector2()
 
         if not self.can_wrap:
@@ -207,7 +205,7 @@ class Boid(Vehicle):
 
             steering += separation + alignment + cohesion
 
-        if  self.follow_cursor:
+        if  follow_cursor:
             steering += self.seek_cursor()
         for rect in list_of_rects:
             if rect.collidepoint((self.position.x,self.position.y)):

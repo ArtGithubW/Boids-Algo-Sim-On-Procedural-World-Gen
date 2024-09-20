@@ -5,15 +5,23 @@ from config import *
 This function generates perlin noises then add them all up into a 2d matrix noise map
 """
 #! This perlin noise library does not have fall off support so I'll just make more noises at higher octaves and add them up at lower values :P
-def GenerateNoiseMap(Inputseed) -> list:
-    noise_map = []
-    noise1 = PerlinNoise(octaves=3,seed = Inputseed) 
-    noise2 = PerlinNoise(octaves=6,seed = Inputseed) 
-    noise3 = PerlinNoise(octaves=12,seed = Inputseed)
-    noise4 = PerlinNoise(octaves=25,seed = Inputseed)
-    noise5 = PerlinNoise(octaves=50,seed = Inputseed) # Adding a 5th noise makes the space looks so much more organic....my lord the time it takes to run though
-    noise6 = PerlinNoise(octaves=80,seed = Inputseed) # screw it, 6th noise :D
+def GenerateNoiseMap(Inputseed=None) -> list:
     
+    noise_map = []
+    if Inputseed:
+        noise1 = PerlinNoise(octaves=3,seed = Inputseed) 
+        noise2 = PerlinNoise(octaves=6,seed = Inputseed) 
+        noise3 = PerlinNoise(octaves=12,seed = Inputseed)
+        noise4 = PerlinNoise(octaves=25,seed = Inputseed)
+        noise5 = PerlinNoise(octaves=50,seed = Inputseed) # Adding a 5th noise makes the space looks so much more organic....my lord the time it takes to run though
+        noise6 = PerlinNoise(octaves=80,seed = Inputseed) # screw it, 6th noise :D
+    else:
+        noise1 = PerlinNoise(octaves=3) 
+        noise2 = PerlinNoise(octaves=6) 
+        noise3 = PerlinNoise(octaves=12)
+        noise4 = PerlinNoise(octaves=25)
+        noise5 = PerlinNoise(octaves=50)
+        noise6 = PerlinNoise(octaves=80)
 
     x_loc, y_loc = WINDOW_WIDTH + 1, WINDOW_HEIGHT + 1
     for j in range(y_loc):

@@ -1,6 +1,6 @@
 import sys
 import pygame as pg
-from pygame.locals import DOUBLEBUF,QUIT
+from pygame.locals import DOUBLEBUF,QUIT,HWSURFACE 
 import pygame_gui
 from boid import Boid
 from config import * 
@@ -15,28 +15,25 @@ def main():
     
     num_boids = 100
     # Init the world generation
-    noise_map = GenerateNoiseMap(Inputseed=SEED)
+    noise_map = GenerateNoiseMap() #Inputseed=SEED
     max_terrain_heights,min_height = GenerateMaxHeights(noise_map)
     map_int = GenerateIntMap(noise_map,max_terrain_heights)
     
     gen_time = time.time()
-    print(f"Time to generate Int Map: {gen_time - start_time}")
+    print(f"Time to generate world Map: {gen_time - start_time}")
     
     #Generate boxes that bois will aboid
     RectDicts = findCoords(map_int)
 
     list_of_rects = []
-    for Index,CoordDict in enumerate(RectDicts): #Coords(x,y)
-        # print(f"Center {Index}, Coords(Y:{CoordDict['center'][0]}, X:{CoordDict['center'][1]})")
-    
+    for Index in range(len(RectDicts)): #Coords(x,y)
         #! I def messed up somewhere here but the data struct is actually (y,x)?????? BUT EVERYTHING WORKS so EHHHH.
         list_of_rects.append(pg.Rect(RectDicts[Index]["center"][1],RectDicts[Index]["center"][0],1,1))
         inflate_x = RectDicts[Index]["rightmost"][1]-RectDicts[Index]["leftmost"][1] + 20
         inflate_y = RectDicts[Index]["bottommost"][0]-RectDicts[Index]["topmost"][0] + 20
         list_of_rects[Index].inflate_ip(inflate_x,inflate_y)
     
-    
-    background_surface = pg.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+    background_surface = pg.Surface((WINDOW_WIDTH+120, WINDOW_HEIGHT))
 
     for y, row in enumerate(map_int):
         for x, value in enumerate(row):
@@ -64,7 +61,7 @@ def main():
             background_surface.set_at((x, y), color)
             
             
-    print(f"Time taken to generate world: {time.time() - gen_time}")
+    print(f"Time taken to color the world: {time.time() - gen_time}")
     # Initialize pygame.
     pg.init()
     
@@ -75,16 +72,15 @@ def main():
     # Set up the window.
     pg.display.set_caption("Boids Sim")
 
-    flags = DOUBLEBUF # Supposedly increases framerate
+    flags = HWSURFACE  # Supposedly increases framerate
      
     screen = pg.display.set_mode((WINDOW_WIDTH+120, WINDOW_HEIGHT), flags)
     screen.set_alpha(None)
-    manager = pygame_gui.UIManager((WINDOW_WIDTH+120, WINDOW_HEIGHT))
-
+    manager = pygame_gui.UIManager((WINDOW_WIDTH+120, WINDOW_HEIGHT))    
     boids = pg.sprite.RenderUpdates()
 
     add_boids(boids, num_boids)
-
+    
     # UI manager to add buttons
     global add_boids_button, remove_boids_button, reset_boids_button,toggle_cursor_follow_button,Wrap_button,debug_button
     add_boids_button = pygame_gui.elements.UIButton(
@@ -117,18 +113,21 @@ def main():
         text='Debug',
         manager=manager
     )
+    screen.blit(background_surface, (0, 0))
     
-    # Main game loop.
-    dt = 1/fps  # dt is the time since last frame.
 
+    dt = 1/fps  # dt is the time since last frame.
+    #Main game loop
     while True:
         update(dt, boids, manager,list_of_rects)
-        draw(screen, background_surface, boids, manager,list_of_rects)
+        draw(screen, background_surface, boids, list_of_rects)
+        manager.draw_ui(screen)
+        pg.display.update()
         dt = fpsClock.tick(fps)
         
 # This function updates the boids(and rectangle locations),pygame_gui buttons
 def update(dt, boids, manager,list_of_rects):
-    global debug
+    global debug,universal_follow_flag
     for event in pg.event.get():
         if event.type == QUIT:
             pg.quit()
@@ -146,8 +145,9 @@ def update(dt, boids, manager,list_of_rects):
                 add_boids(boids, num_boids)
                 print("Reset Boids")
             elif event.ui_element == toggle_cursor_follow_button:
+                universal_follow_flag = not universal_follow_flag
                 for boid in boids:
-                    boid.follow_cursor = not boid.follow_cursor
+                    boid.follow_cursor = universal_follow_flag
                 print(f"Follow Cursor: {not boid.follow_cursor}")
             elif event.ui_element == Wrap_button:
                 for boid in boids:
@@ -157,25 +157,20 @@ def update(dt, boids, manager,list_of_rects):
                 debug = not debug
                 print(f"Debug Mode: {debug}")
         manager.process_events(event)
-
+        
     for b in boids:
-        b.update(dt, boids,list_of_rects)
-
+        b.update(dt, boids,list_of_rects,universal_follow_flag)
     manager.update(dt)
 
 # Draws everything onto the main screen every frame
-def draw(screen, background, boids, manager,list_of_rects):
+def draw(screen, background, boids,list_of_rects):
     global debug
-    # Draw the background
-    screen.blit(background, (0, 0))
-    
+    boids.clear(screen,background)
     if debug:
         for i in range(len(list_of_rects)):
             pg.draw.rect(screen,"red",list_of_rects[i])
-    boids.draw(screen)
-    manager.draw_ui(screen)
-    
-    pg.display.update()
+    dirty_sprites = boids.draw(screen)
+    pg.display.update(dirty_sprites)
 
 # Function to get the interpolation between two colors using the heightmap factor
 def interpolate_color(color1, color2, Color_height):

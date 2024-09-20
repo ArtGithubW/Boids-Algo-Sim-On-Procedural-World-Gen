@@ -32,7 +32,7 @@ def find_clumps(matrix):
 def get_clump_centers_and_extremes(clumps):
     centers_and_extremes = []
     for clump in clumps:
-        
+
         leftmost = min(clump, key=lambda p: p[1])  
         rightmost = max(clump, key=lambda p: p[1]) 
         topmost = min(clump, key=lambda p: p[0])   
@@ -58,3 +58,9 @@ def findCoords(matrix):
 
     # Return the centers and extreme points
     return centers_and_extremes
+
+"""
+#! notes on optimization:
++ Can't change most lists into sets because items are dicts and are not hashable
+#TODO: Look up methods to optimize BFS: Compression? sort+merge BFS?
+"""

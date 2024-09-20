@@ -1,6 +1,6 @@
 #! Window Dimensions
-WINDOW_WIDTH = 600 
-WINDOW_HEIGHT = 500
+WINDOW_WIDTH = 600
+WINDOW_HEIGHT = 600
 
 #! Terrain and color configs:
 debug = False
@@ -14,7 +14,7 @@ OCEAN = 1
 OCEAN_DEEP = 0
 
         
-SEED = 9 #For consistency for now 9 is best, 12 is also good
+SEED = 11 #For consistency for now 9 is best, 12 is also good
 TERRAINWEIGHT =     [70, 20, 15, 40, 30, 20]      
 TERRAINTYPE = [OCEAN_DEEP,OCEAN,BEACH,GRASS,MOUNT,SNOW]
     
@@ -37,5 +37,5 @@ CROWDING = 6           #* Distance between boids(lower is more crowded as there 
 CAN_WRAP = False        #* If boids can wrap to other side
 EDGE_DISTANCE_PCT = 2   #* Distance before boids gets pushed back by the edges
 
-
+universal_follow_flag = False
 
