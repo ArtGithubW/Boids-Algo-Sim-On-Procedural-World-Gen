@@ -74,10 +74,3 @@ def GenerateIntMap(NoiseMap,max_terrain_heights):
                     break
         terrain_int_map.append(map_row) 
     return terrain_int_map
-
-
-"""
-This function takes a minimum and maximum and input and normalizes the input(0.0 to 1.0) based on the minimum and maximum
-"""
-def normalize_Zero_to_One(inputVal, old_min, old_max, new_min = 0.0, new_max=1.0 ):
-    return (inputVal - old_min) / (old_max - old_min) * (new_max - new_min) + new_min

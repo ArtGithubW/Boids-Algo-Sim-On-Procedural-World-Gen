@@ -1,14 +1,16 @@
 import sys
 import pygame as pg
-from pygame.locals import DOUBLEBUF,QUIT,HWSURFACE 
+from pygame.locals import QUIT,HWSURFACE 
 import pygame_gui
-from boid import Boid
-from config import * 
-from FindCenter import findCoords
+from boid import add_boids
+from config import WINDOW_WIDTH,WINDOW_HEIGHT
 import time
+import numpy as np
 
-sys.path.insert(1, './ProceduralGenWPerlinNoise')
+from color import drawColors
+from ProceduralGenWPerlinNoise.FindCenter import findCoords
 from ProceduralGenWPerlinNoise.helper import *
+
 
 def main():
     start_time = time.time()
@@ -34,53 +36,24 @@ def main():
         list_of_rects[Index].inflate_ip(inflate_x,inflate_y)
     
     background_surface = pg.Surface((WINDOW_WIDTH+120, WINDOW_HEIGHT))
+    background_surface = drawColors(background_surface,noise_map,map_int,max_terrain_heights,min_height)
 
-    for y, row in enumerate(map_int):
-        for x, value in enumerate(row):
-
-            if x >= WINDOW_WIDTH or y >= WINDOW_HEIGHT:  # Check boundary conditions
-                continue
-            
-            # This switch case will create a float from 0 to 1 depending on the height of the terrain in respect to its min and max range
-            match value:
-                case 0:
-                    color_height = normalize_Zero_to_One(noise_map[y][x],min_height,max_terrain_heights[0])
-                case 1:
-                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[0],max_terrain_heights[1])
-                case 2:
-                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[1],max_terrain_heights[2])
-                case 3:
-                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[2],max_terrain_heights[3])
-                case 4:
-                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[3],max_terrain_heights[4])
-                case 5:
-                    color_height = normalize_Zero_to_One(noise_map[y][x],max_terrain_heights[4],max_terrain_heights[5])
-                    
-            # Use the gradient color for each pixel
-            color = interpolate_color(GRADIENTS[value][0],GRADIENTS[value][1],color_height)  
-            background_surface.set_at((x, y), color)
-            
-            
     print(f"Time taken to color the world: {time.time() - gen_time}")
-    # Initialize pygame.
-    pg.init()
     
-    # Set up the clock to maintain a relatively constant framerate.
-    fps = 60.0
+    
+    '''
+    Setting up pygame
+    '''
+    pg.init()
+    fps = 24.0
     fpsClock = pg.time.Clock()
-
-    # Set up the window.
     pg.display.set_caption("Boids Sim")
 
-    flags = HWSURFACE  # Supposedly increases framerate
-     
-    screen = pg.display.set_mode((WINDOW_WIDTH+120, WINDOW_HEIGHT), flags)
+    screen = pg.display.set_mode((WINDOW_WIDTH+120, WINDOW_HEIGHT), flags = HWSURFACE)
     screen.set_alpha(None)
     manager = pygame_gui.UIManager((WINDOW_WIDTH+120, WINDOW_HEIGHT))    
     boids = pg.sprite.RenderUpdates()
 
-    add_boids(boids, num_boids)
-    
     # UI manager to add buttons
     global add_boids_button, remove_boids_button, reset_boids_button,toggle_cursor_follow_button,Wrap_button,debug_button
     add_boids_button = pygame_gui.elements.UIButton(
@@ -113,10 +86,44 @@ def main():
         text='Debug',
         manager=manager
     )
-    screen.blit(background_surface, (0, 0))
     
+    #!------------------------------------EXPERIMENTAL-------------------------------------------------------
+    final_surface = drawColors(background_surface, noise_map, map_int, max_terrain_heights, min_height)
 
+    # Initialize transition surface (all pixels start as black)
+    transition_surface = pg.Surface((WINDOW_WIDTH + 120, WINDOW_HEIGHT))
+    transition_surface.fill((0, 0, 0))  # All black surface
+
+    # Get the color values from the final surface
+    final_colors = pg.surfarray.pixels3d(final_surface).copy()
+    current_colors = np.zeros_like(final_colors, dtype=np.uint8)
+    transition_speed = 5  # Change the speed of color transition
+    screen.blit(transition_surface, (0, 0))
+    time.sleep(3)
+    running = True
+    while running:
+        for event in pg.event.get():
+            if event.type == pg.MOUSEBUTTONDOWN:
+                running = False
+
+        # Calculates the step and difference between colors
+        color_difference = final_colors.astype(np.int16) - current_colors.astype(np.int16)
+        step = np.clip(color_difference, -transition_speed, transition_speed)
+
+        # Update the current colors within uint8 range
+        current_colors = np.clip(current_colors.astype(np.int16) + step, 0, 255).astype(np.uint8)
+
+        # Push the changes to the screen
+        pg.surfarray.blit_array(transition_surface, current_colors)
+        screen.blit(transition_surface, (0, 0))
+
+        pg.display.update()
+        fpsClock.tick(fps)
+    #!------------------------------------EXPERIMENTAL-------------------------------------------------------
+    add_boids(boids, num_boids)
+    fps = 60.0 # Set fps to 60 
     dt = 1/fps  # dt is the time since last frame.
+
     #Main game loop
     while True:
         update(dt, boids, manager,list_of_rects)
@@ -167,6 +174,7 @@ def draw(screen, background, boids,list_of_rects):
     global debug
     boids.clear(screen,background)
     if debug:
+        screen.blit(background, (0, 0))
         for i in range(len(list_of_rects)):
             pg.draw.rect(screen,"red",list_of_rects[i])
     else:
@@ -174,17 +182,6 @@ def draw(screen, background, boids,list_of_rects):
     dirty_sprites = boids.draw(screen)
     pg.display.update(dirty_sprites)
 
-# Function to get the interpolation between two colors using the heightmap factor
-def interpolate_color(color1, color2, Color_height):
-    return (
-        int(color1[0] + (color2[0] - color1[0]) * Color_height),
-        int(color1[1] + (color2[1] - color1[1]) * Color_height),
-        int(color1[2] + (color2[2] - color1[2]) * Color_height)
-    )
-
-def add_boids(boids, num_boids):
-    for _ in range(num_boids):
-        boids.add(Boid())
 
 if __name__ == "__main__":
     main()

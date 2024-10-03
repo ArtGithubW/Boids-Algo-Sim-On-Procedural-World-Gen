@@ -212,3 +212,11 @@ class Boid(Vehicle):
                 # print("Collision!")
                 steering += self.avoid_rectangle(rect)
         super().update(dt, steering)
+
+
+'''
+Function to create boid objects
+'''
+def add_boids(boids, num_boids):
+    for _ in range(num_boids):
+        boids.add(Boid())
