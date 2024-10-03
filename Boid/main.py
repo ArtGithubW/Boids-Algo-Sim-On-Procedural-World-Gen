@@ -27,7 +27,7 @@ def main():
 
     list_of_rects = []
     for Index in range(len(RectDicts)): #Coords(x,y)
-        #! I def messed up somewhere here but the data struct is actually (y,x)?????? BUT EVERYTHING WORKS so EHHHH.
+        #! I def messed up somewhere here, the data struct is actually (y,x)?????? BUT EVERYTHING WORKS so EHHHH.
         list_of_rects.append(pg.Rect(RectDicts[Index]["center"][1],RectDicts[Index]["center"][0],1,1))
         inflate_x = RectDicts[Index]["rightmost"][1]-RectDicts[Index]["leftmost"][1] + 20
         inflate_y = RectDicts[Index]["bottommost"][0]-RectDicts[Index]["topmost"][0] + 20
@@ -169,6 +169,8 @@ def draw(screen, background, boids,list_of_rects):
     if debug:
         for i in range(len(list_of_rects)):
             pg.draw.rect(screen,"red",list_of_rects[i])
+    else:
+        screen.blit(background, (0, 0))
     dirty_sprites = boids.draw(screen)
     pg.display.update(dirty_sprites)
 
