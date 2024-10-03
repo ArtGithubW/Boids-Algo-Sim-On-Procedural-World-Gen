@@ -7,6 +7,9 @@ Birds will avoid extremely high terrain like top of mountains. <br/>
 There are some settings that the user can tweak and play around with.<br/>
 More technical configurations is located in /Boid/config.py
 
+![Generation1](https://github.com/user-attachments/assets/6c34ef9a-0a09-4ab6-97a3-0e89def8f1f0) <br/>
+![Generation2](https://github.com/user-attachments/assets/27ee3ff6-9290-4b46-884b-4a795d692471)
+
 ## Dependencies
 
 pip install pygame <br/>
